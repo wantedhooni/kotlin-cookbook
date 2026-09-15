@@ -352,3 +352,7 @@ practice.md!/.gitignore
 hs_err_pid*
 replay_pid*
 
+.kotlin
+
+spring-ai-book/sample_data
+book-spring-ai-java/
