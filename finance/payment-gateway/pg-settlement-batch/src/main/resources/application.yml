@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: pg-settlement-batch
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/app
+    username: app
+    password: app
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true # SQL을 보기 좋게 정렬
+        jdbc:
+          batch_size: 1000
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+      name: pgSettlementJob
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    # org.hibernate.orm.jdbc.bind: DEBUG
