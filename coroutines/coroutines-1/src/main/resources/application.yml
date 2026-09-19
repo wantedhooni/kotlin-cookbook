@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: coroutine-jpa-lab
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/app
+    username: app
+    password: app
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+logging:
+  pattern:
+    # console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+
+  level:
+    com.example.coroutinelab: debug
+    org.hibernate.SQL: debug

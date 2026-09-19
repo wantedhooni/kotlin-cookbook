@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: coroutine-jpa-postgres
+
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
