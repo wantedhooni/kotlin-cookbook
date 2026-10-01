@@ -1,0 +1,8 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: {name: stock-trading, namespace: argocd}
+spec:
+  project: default
+  source: {repoURL: REPLACE_WITH_GIT_REPOSITORY, targetRevision: main, path: infrastructure/kubernetes}
+  destination: {server: https://kubernetes.default.svc, namespace: trading}
+  syncPolicy: {automated: {prune: true, selfHeal: true}}

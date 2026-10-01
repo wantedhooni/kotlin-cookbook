@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: trading-config }
+data:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  DB_URL: "jdbc:postgresql://postgres:5432/trading"
+  REDIS_HOST: "redis"
+  BALANCE_SERVICE_URL: "http://balance-service:8083"
+  ACCOUNT_SERVICE_URL: "http://account-service:8085"
+  MARKET_SESSION_OVERRIDE: "AUTO"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: order-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: order-service } }
+  template:
+    metadata: { labels: { app: order-service } }
+    spec:
+      containers:
+        - name: order-service
+          image: YOUR_ECR/order-service:latest
+          resources:
+            requests: { cpu: "500m", memory: "512Mi" }
+            limits: { cpu: "2", memory: "1Gi" }
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: trading-config } }]
+          readinessProbe: { httpGet: { path: /actuator/health/readiness, port: 8080 }, initialDelaySeconds: 10 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: order-service }
+spec:
+  selector: { app: order-service }
+  ports: [{ port: 8080, targetPort: 8080 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: order-router }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: order-router } }
+  template:
+    metadata: { labels: { app: order-router } }
+    spec:
+      containers:
+        - name: order-router
+          image: YOUR_ECR/order-router:latest
+          envFrom: [{ configMapRef: { name: trading-config } }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: execution-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: execution-service } }
+  template:
+    metadata: { labels: { app: execution-service } }
+    spec:
+      containers:
+        - name: execution-service
+          image: YOUR_ECR/execution-service:latest
+          resources:
+            requests: { cpu: "500m", memory: "512Mi" }
+            limits: { cpu: "2", memory: "1Gi" }
+          envFrom: [{ configMapRef: { name: trading-config } }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: balance-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: balance-service } }
+  template:
+    metadata: { labels: { app: balance-service } }
+    spec:
+      containers:
+        - name: balance-service
+          image: YOUR_ECR/balance-service:latest
+          ports: [{ containerPort: 8083 }]
+          envFrom: [{ configMapRef: { name: trading-config } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: balance-service }
+spec:
+  selector: { app: balance-service }
+  ports: [{ port: 8083, targetPort: 8083 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: mock-krx }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: mock-krx } }
+  template:
+    metadata: { labels: { app: mock-krx } }
+    spec:
+      containers:
+        - name: mock-krx
+          image: YOUR_ECR/mock-krx:latest
+          envFrom: [{ configMapRef: { name: trading-config } }]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: account-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: account-service } }
+  template:
+    metadata: { labels: { app: account-service } }
+    spec:
+      containers:
+        - name: account-service
+          image: YOUR_ECR/account-service:latest
+          ports: [{ containerPort: 8085 }]
+          envFrom: [{ configMapRef: { name: trading-config } }]
+          readinessProbe: { httpGet: { path: /actuator/health/readiness, port: 8085 }, initialDelaySeconds: 10 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: account-service }
+spec:
+  selector: { app: account-service }
+  ports: [{ port: 8085, targetPort: 8085 }]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: settlement-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: settlement-service } }
+  template:
+    metadata: { labels: { app: settlement-service } }
+    spec:
+      containers:
+        - name: settlement-service
+          image: YOUR_ECR/settlement-service:latest
+          resources:
+            requests: { cpu: "250m", memory: "256Mi" }
+            limits: { cpu: "1", memory: "512Mi" }
+          ports: [{ containerPort: 8086 }]
+          envFrom: [{ configMapRef: { name: trading-config } }]
+          readinessProbe: { httpGet: { path: /actuator/health/readiness, port: 8086 }, initialDelaySeconds: 10 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: settlement-service }
+spec:
+  selector: { app: settlement-service }
+  ports: [{ port: 8086, targetPort: 8086 }]

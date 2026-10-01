@@ -1,0 +1,39 @@
+server:
+  port: ${SERVER_PORT:8086}
+spring:
+  application:
+    name: settlement-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/trading}
+    username: ${DB_USER:trading}
+    password: ${DB_PASSWORD:trading}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_schema: settlement_svc
+  flyway:
+    schemas: settlement_svc
+    create-schemas: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+services:
+  account:
+    base-url: ${ACCOUNT_SERVICE_URL:http://localhost:8085}
+settlement:
+  holidays: ${SETTLEMENT_HOLIDAYS:}
+  processing-date-override: ${SETTLEMENT_DATE_OVERRIDE:}
+  cron: ${SETTLEMENT_CRON:0 5 16 * * MON-FRI}
+management:
+  metrics:
+    tags:
+      application: settlement-service
+  endpoints.web.exposure.include: health,info,prometheus

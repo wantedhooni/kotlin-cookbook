@@ -1,0 +1,40 @@
+server:
+  port: ${SERVER_PORT:8085}
+spring:
+  application:
+    name: account-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/trading}
+    username: ${DB_USER:trading}
+    password: ${DB_PASSWORD:trading}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_schema: account_svc
+  flyway:
+    schemas: account_svc
+    create-schemas: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+trading:
+  margin:
+    default-rate: ${DEFAULT_MARGIN_RATE:1.00}
+    market-buffer-rate: ${MARKET_BUFFER_RATE:0.10}
+    market-reference-price: ${MARKET_REFERENCE_PRICE:70000}
+
+management:
+  metrics:
+    tags:
+      application: account-service
+  endpoints.web.exposure.include: health,info,prometheus
