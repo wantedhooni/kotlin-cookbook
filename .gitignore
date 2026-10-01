@@ -356,3 +356,7 @@ replay_pid*
 
 spring-ai-book/sample_data
 book-spring-ai-java/
+!book-spring-ai-java/
+book-spring-ai-java/**/*
+!book-spring-ai-java/**/
+!book-spring-ai-java/**/README.md
