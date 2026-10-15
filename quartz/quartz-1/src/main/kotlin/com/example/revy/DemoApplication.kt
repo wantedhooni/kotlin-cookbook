@@ -1,11 +1,11 @@
-package com.revy
+package com.example.revy
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class AppApplication
+class DemoApplication
 
 fun main(args: Array<String>) {
-    runApplication<AppApplication>(*args)
+    runApplication<DemoApplication>(*args)
 }
