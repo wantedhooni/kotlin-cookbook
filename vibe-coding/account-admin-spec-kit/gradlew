@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Offline-built starter: Gradle distribution bootstrap (not the official Gradle wrapper JAR).
+set -euo pipefail
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION="8.14.3"
+DIST="${GRADLE_USER_HOME:-$HOME/.gradle}/starter-distributions/gradle-$VERSION"
+if [[ ! -x "$DIST/bin/gradle" ]]; then
+  mkdir -p "$(dirname "$DIST")"
+  ARCHIVE="$(dirname "$DIST")/gradle-$VERSION-bin.zip"
+  URL="https://services.gradle.org/distributions/gradle-$VERSION-bin.zip"
+  if [[ ! -f "$ARCHIVE" ]]; then
+    if command -v curl >/dev/null 2>&1; then curl -fL --retry 3 "$URL" -o "$ARCHIVE"
+    elif command -v wget >/dev/null 2>&1; then wget "$URL" -O "$ARCHIVE"
+    else echo "curl or wget is required to download Gradle" >&2; exit 1; fi
+  fi
+  command -v unzip >/dev/null 2>&1 || { echo "unzip is required" >&2; exit 1; }
+  unzip -oq "$ARCHIVE" -d "$(dirname "$DIST")"
+fi
+exec "$DIST/bin/gradle" -p "$BASE" "$@"

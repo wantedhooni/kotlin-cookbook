@@ -1,0 +1,58 @@
+server:
+  port: 8080
+  error:
+    include-message: never
+
+spring:
+  application:
+    name: account-admin
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/account_admin}
+    username: ${DB_USERNAME:account_admin}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+        acks: all
+    admin:
+      fail-fast: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD}
+  audit:
+    topic: accounts.audit.v1
+
+logging:
+  level:
+    root: INFO

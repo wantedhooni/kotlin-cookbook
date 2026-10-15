@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Account Admin</title>
+  <link rel="stylesheet" href="/app.css" />
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div><div class="eyebrow">OPERATIONS CONSOLE</div><h1>계정 관리</h1><p>계정 검색 · 역할 · 상태 · 변경 이력 이벤트</p></div>
+      <button id="logout" class="ghost" type="button" hidden>로그아웃</button>
+    </header>
+    <main>
+      <section id="login-section" class="panel login-panel">
+        <div class="section-heading"><h2>관리자 인증</h2><p>로컬 개발용 Basic 인증입니다. 로그인 정보는 브라우저 저장소에 보관하지 않습니다.</p></div>
+        <form id="login-form" class="stack">
+          <label>관리자 ID <input name="username" value="admin" autocomplete="username" required /></label>
+          <label>비밀번호 <input type="password" name="password" autocomplete="current-password" required /></label>
+          <button type="submit" class="primary">로그인</button>
+        </form>
+      </section>
+
+      <div id="dashboard" hidden>
+        <div class="metrics"><section class="metric"><span>검색된 계정</span><strong id="total-count">–</strong></section><section class="metric"><span>현재 페이지</span><strong id="page-number">–</strong></section><section class="metric"><span>조회 정책</span><strong class="metric-small">삭제 계정 기본 제외</strong></section></div>
+        <section class="panel">
+          <div class="section-heading"><h2>계정 검색</h2><p>로그인 ID, 이메일, 표시 이름으로 검색합니다.</p></div>
+          <form id="filter-form" class="filters">
+            <label>검색어<input id="keyword" placeholder="로그인 ID / 이메일 / 이름" /></label>
+            <label>역할<select id="role-filter"><option value="">모든 역할</option><option>USER</option><option>ADMIN</option></select></label>
+            <label>상태<select id="status-filter"><option value="">전체 (삭제 제외)</option><option>ACTIVE</option><option>SUSPENDED</option><option>DELETED</option></select></label>
+            <button type="submit" class="primary">조회</button>
+          </form>
+        </section>
+        <section class="panel">
+          <div class="section-heading heading-row"><div><h2>계정 목록</h2><p>변경은 즉시 저장되며 Kafka 감사 이벤트가 생성됩니다.</p></div><button id="toggle-create" class="primary" type="button">+ 계정 추가</button></div>
+          <form id="create-form" class="create-form" hidden>
+            <label>로그인 ID<input name="loginId" minlength="3" maxlength="50" pattern="[a-zA-Z0-9._-]{3,50}" required /></label>
+            <label>이메일<input name="email" type="email" maxlength="255" required /></label>
+            <label>표시 이름<input name="displayName" maxlength="100" required /></label>
+            <label>역할<select name="role"><option>USER</option><option>ADMIN</option></select></label>
+            <button class="primary" type="submit">생성</button>
+          </form>
+          <div class="table-wrap"><table><thead><tr><th>계정</th><th>이메일</th><th>역할</th><th>상태</th><th>생성일</th><th>작업</th></tr></thead><tbody id="account-rows"></tbody></table></div>
+          <div class="pagination"><button id="prev" class="ghost" type="button">이전</button><span id="page-info">–</span><button id="next" class="ghost" type="button">다음</button></div>
+        </section>
+      </div>
+      <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+    </main>
+    <footer>Account Admin · Spring Boot / Kotlin / PostgreSQL / Redis / Kafka</footer>
+  </div>
+</body>
+</html>

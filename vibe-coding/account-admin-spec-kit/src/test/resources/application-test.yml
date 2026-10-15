@@ -1,0 +1,12 @@
+app:
+  admin:
+    username: admin
+    password: test-admin-password
+  audit:
+    topic: accounts.audit.v1
+spring:
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none
