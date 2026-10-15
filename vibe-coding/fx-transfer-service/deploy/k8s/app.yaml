@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fx-transfer-api
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  selector:
+    matchLabels: { app: fx-transfer-api }
+  template:
+    metadata:
+      labels: { app: fx-transfer-api }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      serviceAccountName: fx-transfer-api
+      terminationGracePeriodSeconds: 60
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app: fx-transfer-api }
+      containers:
+        - name: api
+          image: REPLACE_WITH_ECR_URI_AND_IMMUTABLE_TAG
+          ports: [{ containerPort: 8080 }]
+          envFrom:
+            - configMapRef: { name: fx-transfer-config }
+            - secretRef: { name: fx-transfer-secrets }
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: 8080 }
+            initialDelaySeconds: 15
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: 8080 }
+            initialDelaySeconds: 35
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { cpu: "1", memory: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: fx-transfer-api }
+spec:
+  selector: { app: fx-transfer-api }
+  ports: [{ port: 80, targetPort: 8080 }]

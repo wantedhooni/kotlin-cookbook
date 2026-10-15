@@ -1,0 +1,18 @@
+groups:
+  - name: fx-transfer-safety
+    rules:
+      - alert: BankReconciliationBacklog
+        expr: bank_saga_unknown_count > 50
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: 'Bank transfers require reconciliation' }
+      - alert: BankReconciliationExhausted
+        expr: bank_saga_reconciliation_exhausted_count > 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: 'Manual bank reconciliation required' }
+      - alert: OutboxBacklog
+        expr: outbox_pending_count > 500
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: 'Outbox publisher falling behind' }

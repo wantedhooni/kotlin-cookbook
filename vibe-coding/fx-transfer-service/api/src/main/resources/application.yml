@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: fx-transfer-service
+  profiles:
+    default: demo
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fxdb}
+    username: ${DB_USER:fx}
+    password: ${DB_PASSWORD:fx}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+server:
+  port: ${PORT:8080}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+fx:
+  provider:
+    base-url: ${FX_PROVIDER_BASE_URL:http://localhost:18081}
+    api-key: ${FX_PROVIDER_API_KEY:replace-me}
+  outbox:
+    topic: ${KAFKA_TOPIC:financial-events}
+    poll-ms: 3000
+bank:
+  base-url: ${BANK_BASE_URL:http://localhost:18082}
+  api-key: ${BANK_API_KEY:replace-me}
+  # Monitoring and alert thresholds are environment-specific.
+  # Demo adapter returns PENDING; production must use an authenticated bank status API.
+  reconciliation:
+    poll-ms: ${BANK_RECONCILIATION_POLL_MS:15000}
+    batch-size: ${BANK_RECONCILIATION_BATCH_SIZE:20}
+    max-attempts: ${BANK_RECONCILIATION_MAX_ATTEMPTS:25}

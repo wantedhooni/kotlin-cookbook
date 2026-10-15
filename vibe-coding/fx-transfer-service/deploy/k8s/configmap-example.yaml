@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: fx-transfer-config }
+data:
+  SPRING_PROFILES_ACTIVE: seoul-fx,bank-http
+  KAFKA_BOOTSTRAP_SERVERS: REPLACE_WITH_MSK_BOOTSTRAP
+  REDIS_HOST: REPLACE_WITH_ELASTICACHE_ENDPOINT
+# Secrets (DB credentials, provider keys) must come from AWS Secrets Manager / External Secrets, not Git.

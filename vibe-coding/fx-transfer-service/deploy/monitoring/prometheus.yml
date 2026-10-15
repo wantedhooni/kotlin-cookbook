@@ -1,0 +1,9 @@
+rule_files:
+  - /etc/prometheus/alerts.yml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: fx-transfer
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api:8080"]
