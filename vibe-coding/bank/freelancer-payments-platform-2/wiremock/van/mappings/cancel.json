@@ -1,0 +1,4 @@
+{
+  "request": { "method": "POST", "urlPath": "/van/cancellations" },
+  "response": { "status": 204 }
+}

@@ -1,0 +1,13 @@
+{
+  "request": { "method": "POST", "urlPath": "/van/authorizations" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "approved": true,
+      "vanTransactionId": "van-{{randomValue length=16 type='ALPHANUMERIC'}}",
+      "code": "00"
+    },
+    "transformers": ["response-template"]
+  }
+}

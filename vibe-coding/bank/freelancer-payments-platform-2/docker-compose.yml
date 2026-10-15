@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: payments
+      POSTGRES_PASSWORD: payments
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payments -d payments"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mock-van:
+    image: wiremock/wiremock:3.13.1
+    ports:
+      - "18081:8080"
+    volumes:
+      - ./wiremock/van:/home/wiremock
+    command: ["--global-response-templating", "--verbose"]
+
+  mock-bank:
+    image: wiremock/wiremock:3.13.1
+    ports:
+      - "18082:8080"
+    volumes:
+      - ./wiremock/bank:/home/wiremock
+    command: ["--global-response-templating", "--verbose"]
+
+  app:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/payments
+      DB_USER: payments
+      DB_PASSWORD: payments
+      VAN_BASE_URL: http://mock-van:8080
+      BANK_BASE_URL: http://mock-bank:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-van:
+        condition: service_started
+      mock-bank:
+        condition: service_started
+
+  k6:
+    image: grafana/k6:0.54.0
+    profiles: ["load"]
+    volumes:
+      - ./loadtest:/scripts
+    entrypoint: ["k6", "run", "/scripts/payment.js"]
+    environment:
+      BASE_URL: http://app:8080
+    depends_on:
+      - app
+
+volumes:
+  pgdata:

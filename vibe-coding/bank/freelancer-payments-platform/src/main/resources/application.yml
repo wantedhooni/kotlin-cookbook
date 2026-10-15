@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: freelancer-payments-platform
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:payments;MODE=PostgreSQL;DB_CLOSE_DELAY=-1}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: UTC
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+
+integrations:
+  van:
+    base-url: ${VAN_BASE_URL:http://localhost:18081}
+  bank:
+    base-url: ${BANK_BASE_URL:http://localhost:18082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

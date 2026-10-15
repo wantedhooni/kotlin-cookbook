@@ -1,0 +1,13 @@
+{
+  "request": { "method": "POST", "urlPath": "/bank/transfers" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "accepted": true,
+      "transferId": "bank-{{randomValue length=16 type='ALPHANUMERIC'}}",
+      "code": "ACCEPTED"
+    },
+    "transformers": ["response-template"]
+  }
+}
