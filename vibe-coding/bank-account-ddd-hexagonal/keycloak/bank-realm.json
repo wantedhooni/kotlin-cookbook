@@ -1,0 +1,50 @@
+{
+  "realm": "bank",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "bank-api",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "audience-bank-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "bank-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice-dev-password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob-dev-password",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: bank-account
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bank}
+    username: ${DB_USER:bank}
+    password: ${DB_PASSWORD:bank}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+app:
+  transfer:
+    daily-limit: ${DAILY_TRANSFER_LIMIT:10000000.00}
+  security:
+    issuer-uri: ${JWT_ISSUER_URI:http://localhost:8081/realms/bank}
+    jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8081/realms/bank/protocol/openid-connect/certs}
+    audience: ${JWT_AUDIENCE:bank-api}
+  outbox:
+    poll-ms: 2000
+  kafka:
+    topic: account-events
+    dlq-topic: account-events.DLQ
